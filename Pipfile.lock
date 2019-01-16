@@ -1,0 +1,29 @@
+{
+    "_meta": {
+        "hash": {
+            "sha256": "ea8f2b09abf639a4c187050360423c5fdc963874b1d16fbd6adcf1916f4726af"
+        },
+        "pipfile-spec": 6,
+        "requires": {
+            "python_version": "3.7"
+        },
+        "sources": [
+            {
+                "name": "pypi",
+                "url": "https://pypi.org/simple",
+                "verify_ssl": true
+            }
+        ]
+    },
+    "default": {
+        "pyatmo": {
+            "git": "https://github.com/085astatine/pyatmo.git",
+            "ref": "ffc1437de882b7e4a0c3f97c08e7bc398c6d77b5"
+        },
+        "slackbot": {
+            "git": "https://github.com/085astatine/slackbot.git",
+            "ref": "3a7eaf5a18543b2aafe21052e80ae14769f4ea45"
+        }
+    },
+    "develop": {}
+}
