@@ -21,6 +21,7 @@ class Pyatmo(slackbot.Action):
                 self.config.pyatmo_client.secret_file,
                 self.config.pyatmo_client.oauth_token_file,
                 self.config.pyatmo_client.token_scope,
+                self.config.pyatmo_client.request_interval,
                 self._logger)
 
     @staticmethod
@@ -44,7 +45,12 @@ class Pyatmo(slackbot.Action):
                 'token_scope',
                 action=_parse_token,
                 sample=['read_station'],
-                help='scope required by token')],
+                help='scope required by token'),
+             slackbot.Option(
+                'request_interval',
+                default=1.0,
+                action=lambda x: float(x) if x is not None else None,
+                help='minimum interval seconds between API requests')],
             help='pyatmo API client')
         return slackbot.OptionList(
             name,
@@ -55,6 +61,7 @@ def _setup_pyatmo_client(
         secret_file: pathlib.Path,
         oauth_token_file: pathlib.Path,
         scope_list: Optional[List[pyatmo.Scope]],
+        request_interval: Optional[float],
         logger: logging.Logger) -> pyatmo.Client:
     # load secret
     if not secret_file.exists():
@@ -70,6 +77,7 @@ def _setup_pyatmo_client(
             client_secret=client_secret,
             scope_list=scope_list,
             token_file=oauth_token_file,
+            request_interval=request_interval,
             logger=logger.getChild('client'))
     # initial authenication
     if not oauth_token_file.exists():
