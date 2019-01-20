@@ -5,6 +5,7 @@ import pathlib
 from typing import Any, List, Optional
 import yaml
 import pyatmo
+import pyatmo.weather
 import slackbot
 
 
@@ -23,6 +24,11 @@ class Pyatmo(slackbot.Action):
                 self.config.pyatmo_client.token_scope,
                 self.config.pyatmo_client.request_interval,
                 self._logger)
+        self._weather_database = pyatmo.weather.Database(
+                self.config.weather.database_path,
+                self._pyatmo_client,
+                logger=self._logger.getChild('weather_database'),
+                sql_logging=self.config.weather.sql_log_level)
 
     @staticmethod
     def option_list(name: str) -> slackbot.OptionList:
@@ -52,9 +58,25 @@ class Pyatmo(slackbot.Action):
                 action=lambda x: float(x) if x is not None else None,
                 help='minimum interval seconds between API requests')],
             help='pyatmo API client')
+        weather_option = slackbot.OptionList(
+            'weather',
+            [slackbot.Option(
+                'database_path',
+                type=pathlib.Path,
+                required=True,
+                help='path to sqlite3 file to record'),
+             slackbot.Option(
+                'sql_log_level',
+                action=lambda x: getattr(pyatmo.weather.SQLLogging, x.upper()),
+                default='none',
+                choices=[str(x.name).lower()
+                         for x in pyatmo.weather.SQLLogging],
+                help='print sql statement & row')],
+            help='weather database')
         return slackbot.OptionList(
             name,
-            [pyatmo_client_option])
+            [pyatmo_client_option,
+             weather_option])
 
 
 def _setup_pyatmo_client(
