@@ -5,8 +5,8 @@ import pathlib
 from typing import Any, List, Optional
 import yaml
 import pyatmo
-import pyatmo.weather
 import slackbot
+from . import weather
 
 
 class Pyatmo(slackbot.Action):
@@ -24,11 +24,10 @@ class Pyatmo(slackbot.Action):
                 self.config.pyatmo_client.token_scope,
                 self.config.pyatmo_client.request_interval,
                 self._logger)
-        self._weather_database = pyatmo.weather.Database(
-                self.config.weather.database_path,
+        self._weather = weather.Weather(
+                self.config,
                 self._pyatmo_client,
-                logger=self._logger.getChild('weather_database'),
-                sql_logging=self.config.weather.sql_log_level)
+                logger=self._logger.getChild('weather'))
 
     @staticmethod
     def option_list(name: str) -> slackbot.OptionList:
