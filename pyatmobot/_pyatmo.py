@@ -65,6 +65,11 @@ class Pyatmo(slackbot.Action):
                 required=True,
                 help='path to sqlite3 file to record'),
              slackbot.Option(
+                'register_favorite_devices',
+                default=False,
+                type=bool,
+                help='whether to register favorite devices in the database'),
+             slackbot.Option(
                 'sql_log_level',
                 action=lambda x: getattr(pyatmo.weather.SQLLogging, x.upper()),
                 default='none',
