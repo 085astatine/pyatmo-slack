@@ -18,7 +18,7 @@
     "default": {
         "pyatmo": {
             "git": "https://github.com/085astatine/pyatmo.git",
-            "ref": "ffc1437de882b7e4a0c3f97c08e7bc398c6d77b5"
+            "ref": "50d0c5fe9dc92851eeae31633b78d05337b30a5a"
         },
         "slackbot": {
             "git": "https://github.com/085astatine/slackbot.git",
