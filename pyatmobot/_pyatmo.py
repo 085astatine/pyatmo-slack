@@ -2,7 +2,7 @@
 
 import logging
 import pathlib
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional
 import yaml
 import pyatmo
 import slackbot
@@ -28,6 +28,9 @@ class Pyatmo(slackbot.Action):
                 self.config,
                 self._pyatmo_client,
                 logger=self._logger.getChild('weather'))
+
+    def run(self, api_list: List[Dict[str, Any]]) -> None:
+        self._weather.update()
 
     @staticmethod
     def option_list(name: str) -> slackbot.OptionList:
@@ -69,6 +72,15 @@ class Pyatmo(slackbot.Action):
                 default=False,
                 type=bool,
                 help='whether to register favorite devices in the database'),
+             slackbot.Option(
+                'database_update_interval',
+                default=600,
+                help='database update interval seconds'),
+             slackbot.Option(
+                'database_update_step',
+                action=lambda x: int(x) if x is not None else None,
+                default=10,
+                help='number of API requests per update (unlimited if None)'),
              slackbot.Option(
                 'sql_log_level',
                 action=lambda x: getattr(pyatmo.weather.SQLLogging, x.upper()),
