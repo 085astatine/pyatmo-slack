@@ -22,7 +22,7 @@
         },
         "slackbot": {
             "git": "https://github.com/085astatine/slackbot.git",
-            "ref": "3a7eaf5a18543b2aafe21052e80ae14769f4ea45"
+            "ref": "f24a28f45becea82d306cbff868fd27fc2fb6930"
         }
     },
     "develop": {}
