@@ -7,27 +7,26 @@ import threading
 from typing import Any, Optional
 import pyatmo
 import pyatmo.weather
+from ._option import DatabaseOption
 
 
 class Weather:
     def __init__(
                 self,
-                config: Any,
+                option: DatabaseOption,
                 pyatmo_client: pyatmo.Client,
                 logger: logging.Logger) -> None:
-        self._config = config
+        self._option = option
         self._logger = logger
         self._database = pyatmo.weather.Database(
-                self._config.weather.database_path,
+                self._option.path,
                 pyatmo_client,
                 logger=self._logger.getChild('database'),
-                sql_logging=self._config.weather.sql_log_level)
+                sql_logging=self._option.sql_log_level)
         # register devices
         self._database.register(
-                get_favorites=self._config.weather.register_favorite_devices)
+                get_favorites=self._option.register_favorite_devices)
         # update
-        self._update_interval: float = config.weather.database_update_interval
-        self._update_step: Optional[int] = config.weather.database_update_step
         self._update_thread: Optional[threading.Thread] = None
         self._update_thread_queue: queue.Queue[bool] = queue.Queue(maxsize=1)
         self._update_suspension_limit: Optional[datetime.datetime] = None
@@ -49,7 +48,10 @@ class Weather:
                 self._update_thread = None
                 self._update_suspension_limit = (
                         datetime.datetime.now()
-                        + datetime.timedelta(seconds=self._update_interval))
+                        + datetime.timedelta(
+                                seconds=self._option.update_interval)
+                        if self._option.update_interval is not None
+                        else None)
 
 
 def _start_update_thread(self: Weather) -> None:
@@ -58,8 +60,8 @@ def _start_update_thread(self: Weather) -> None:
             target=_update_database,
             args=(self._database,
                   self._update_thread_queue,
-                  self._update_step,
-                  self._update_interval))
+                  self._option.update_step,
+                  self._option.update_interval))
     self._update_thread.start()
 
 
