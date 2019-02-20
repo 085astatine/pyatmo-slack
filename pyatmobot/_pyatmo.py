@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Optional
 import yaml
 import pyatmo
 import slackbot
+from ._option import PyatmoOption
 from . import weather
 
 
@@ -33,66 +34,8 @@ class Pyatmo(slackbot.Action):
         self._weather.update()
 
     @staticmethod
-    def option_list(name: str) -> slackbot.OptionList:
-        pyatmo_client_option = slackbot.OptionList(
-            'pyatmo_client',
-            [slackbot.Option(
-                'secret_file',
-                type=pathlib.Path,
-                required=True,
-                help='YAML file with'
-                     ' client_id & client_secret. '
-                     '(required only for initial authentication:'
-                     ' username & password)'),
-             slackbot.Option(
-                'oauth_token_file',
-                type=pathlib.Path,
-                required=True,
-                help='path to the file to save & load oauth tokens'),
-             slackbot.Option(
-                'token_scope',
-                action=_parse_token,
-                sample=['read_station'],
-                help='scope required by token'),
-             slackbot.Option(
-                'request_interval',
-                default=1.0,
-                action=lambda x: float(x) if x is not None else None,
-                help='minimum interval seconds between API requests')],
-            help='pyatmo API client')
-        weather_option = slackbot.OptionList(
-            'weather',
-            [slackbot.Option(
-                'database_path',
-                type=pathlib.Path,
-                required=True,
-                help='path to sqlite3 file to record'),
-             slackbot.Option(
-                'register_favorite_devices',
-                default=False,
-                type=bool,
-                help='whether to register favorite devices in the database'),
-             slackbot.Option(
-                'database_update_interval',
-                default=600,
-                help='database update interval seconds'),
-             slackbot.Option(
-                'database_update_step',
-                action=lambda x: int(x) if x is not None else None,
-                default=10,
-                help='number of API requests per update (unlimited if None)'),
-             slackbot.Option(
-                'sql_log_level',
-                action=lambda x: getattr(pyatmo.weather.SQLLogging, x.upper()),
-                default='none',
-                choices=[str(x.name).lower()
-                         for x in pyatmo.weather.SQLLogging],
-                help='print sql statement & row')],
-            help='weather database')
-        return slackbot.OptionList(
-            name,
-            [pyatmo_client_option,
-             weather_option])
+    def option_list(name: str) -> slackbot.OptionList[PyatmoOption]:
+        return PyatmoOption.option_list(name)
 
 
 def _setup_pyatmo_client(
@@ -126,22 +69,3 @@ def _setup_pyatmo_client(
                              .format(key, secret_file))
         client.authorize(secret['username'], secret['password'])
     return client
-
-
-def _parse_token(value: Any) -> Optional[List[pyatmo.Scope]]:
-    # None -> None
-    if value is None:
-        return None
-    # str -> [str]
-    if isinstance(value, str):
-        value = [value]
-    result: List[pyatmo.Scope] = []
-    for x in value:
-        for scope in pyatmo.Scope:
-            if str(scope) == x:
-                result.append(scope)
-                break
-        else:
-            message = "'{0}' is an invalid value for scope.".format(x)
-            raise slackbot.OptionError(message)
-    return sorted(result)
