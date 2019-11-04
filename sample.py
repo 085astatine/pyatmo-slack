@@ -22,5 +22,4 @@ if __name__ == '__main__':
                 action_dict={'APILogger': slackbot.action.APILogger,
                              'Pyatmo': pyatmobot.Pyatmo},
                 logger=logger)
-    bot.initialize()
     bot.start()

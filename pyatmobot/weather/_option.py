@@ -11,7 +11,7 @@ class DatabaseOption(NamedTuple):
     register_favorite_devices: bool
     update_interval: Optional[float]
     update_step: Optional[int]
-    sql_log_level: pyatmo.weather.SQLLogging
+    sql_log_level: pyatmo.weather.SQLLoggingLevel
 
     @staticmethod
     def option_list(
@@ -41,9 +41,11 @@ class DatabaseOption(NamedTuple):
                 help='number of API requests per update (unlimited if None)'),
              slackbot.Option(
                 'sql_log_level',
-                action=lambda x: getattr(pyatmo.weather.SQLLogging, x.upper()),
+                action=lambda x: getattr(
+                        pyatmo.weather.SQLLoggingLevel,
+                        x.upper()),
                 default='none',
                 choices=[str(x.name).lower()
-                         for x in pyatmo.weather.SQLLogging],
+                         for x in pyatmo.weather.SQLLoggingLevel],
                 help='print sql statement & row')],
             help=help)

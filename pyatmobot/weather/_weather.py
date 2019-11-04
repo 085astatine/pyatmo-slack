@@ -4,7 +4,8 @@ import datetime
 import logging
 import queue
 import threading
-from typing import Any, Optional
+from typing import Optional
+import slack
 import pyatmo
 import pyatmo.weather
 from ._option import DatabaseOption
@@ -22,7 +23,7 @@ class Weather:
                 self._option.path,
                 pyatmo_client,
                 logger=self._logger.getChild('database'),
-                sql_logging=self._option.sql_log_level)
+                sql_logging_level=self._option.sql_log_level)
         # register devices
         self._database.register(
                 get_favorites=self._option.register_favorite_devices)
@@ -31,7 +32,9 @@ class Weather:
         self._update_thread_queue: queue.Queue[bool] = queue.Queue(maxsize=1)
         self._update_suspension_limit: Optional[datetime.datetime] = None
 
-    def update(self) -> None:
+    def update(
+            self,
+            client: slack.WebClient) -> None:
         # update database
         if (self._update_thread is None
             and (self._update_suspension_limit is None

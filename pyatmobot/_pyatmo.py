@@ -2,7 +2,8 @@
 
 import logging
 import pathlib
-from typing import Any, Dict, List, Optional
+from typing import Optional
+import slack
 import yaml
 import pyatmo
 import slackbot
@@ -27,8 +28,10 @@ class Pyatmo(slackbot.Action[PyatmoOption]):
                 self._pyatmo_client,
                 logger=self._logger.getChild('weather'))
 
-    def run(self, api_list: List[Dict[str, Any]]) -> None:
-        self._weather.update()
+    def update(
+            self,
+            client: slack.WebClient) -> None:
+        self._weather.update(client)
 
     @staticmethod
     def option_list(name: str) -> slackbot.OptionList[PyatmoOption]:
