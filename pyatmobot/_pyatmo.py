@@ -45,8 +45,10 @@ def _setup_pyatmo_client(
         logger.error("secret file '{0}' does not exist"
                      .format(option.secret_file))
     logger.info('open secret file: {0}'.format(option.secret_file))
-    with option.secret_file.open() as file:
-        secret = yaml.load(file)
+    with option.secret_file.open() as secret_file:
+        secret = yaml.load(
+                secret_file,
+                Loader=yaml.SafeLoader)
         client_id = secret['client_id']
         client_secret = secret['client_secret']
     # create client
