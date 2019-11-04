@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import logging
-import pathlib
 from typing import Optional
 import slack
 import yaml

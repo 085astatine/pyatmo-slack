@@ -83,4 +83,4 @@ class PyatmoOption(NamedTuple):
                  weather.DatabaseOption.option_list(
                         'weather_database',
                         help='weather database')],
-                help='')
+                help=help)
