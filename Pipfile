@@ -8,6 +8,7 @@ verify_ssl = true
 [packages]
 pyatmo = {git = "https://github.com/085astatine/pyatmo.git"}
 slackbot = {git = "https://github.com/085astatine/slackbot.git"}
+matplotlib = "*"
 
 [requires]
 python_version = "3.7"
