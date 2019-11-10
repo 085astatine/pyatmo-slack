@@ -1,17 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import enum
 import datetime
 from typing import Optional, Sequence, Union
 import matplotlib
+from ._plot_setting import XAxisMode
 
 
-class XAxisMode(enum.Enum):
-    YEAR = enum.auto()
-    MONTH = enum.auto()
-    DAY = enum.auto()
-    HOUR = enum.auto()
-    AUTO = enum.auto()
 
 
 def setup_xaxis(
