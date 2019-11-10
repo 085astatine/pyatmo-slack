@@ -6,15 +6,14 @@ import matplotlib
 import numpy
 import pyatmo.weather
 import pytz
-from ._plot_setting import DataSource, MeasurementsField, XAxisMode
+from ._plot_setting import DataSource, MeasurementsField, TimeRange, XAxisMode
 
 
 def get_data(
         database: pyatmo.weather.Database,
         source: DataSource,
         fields: Union[MeasurementsField, Sequence[MeasurementsField]],
-        origin: datetime.datetime,
-        period: datetime.timedelta) -> List[numpy.ndarray]:
+        time_range: TimeRange) -> List[numpy.ndarray]:
     if isinstance(fields, MeasurementsField):
         fields = [fields]
     device_list = [device for device in database.all_device()
@@ -29,8 +28,8 @@ def get_data(
         timezone = pytz.timezone(module.device.timezone)
         measurements_list = database.measurements(
                 module,
-                int(origin.timestamp()),
-                int((origin + period).timestamp()))
+                int(time_range.origin.timestamp()),
+                int(time_range.destination.timestamp()))
         result.append(numpy.array([
                 [timezone.localize(
                         datetime.datetime.fromtimestamp(x.timestamp)),
@@ -41,14 +40,13 @@ def get_data(
 
 def setup_xaxis(
         axes: matplotlib.axes.Axes,
-        origin: datetime.datetime,
-        period: datetime.timedelta,
+        time_range: TimeRange,
         mode: XAxisMode,
         with_minor_ticks: bool = False,
         minor_ticks: Optional[Union[int, Sequence[int]]] = None) -> None:
-    tzinfo = origin.tzinfo
+    tzinfo = time_range.tzinfo
     # range
-    axes.set_xlim([origin, origin + period])
+    axes.set_xlim([time_range.origin, time_range.destination])
     # ticks
     if mode is XAxisMode.YEAR:
         axes.xaxis.set_major_locator(

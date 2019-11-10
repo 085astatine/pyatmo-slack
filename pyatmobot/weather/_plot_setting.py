@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import datetime
 import enum
 from typing import NamedTuple, Optional, Union
 import pyatmo.weather
@@ -47,6 +48,24 @@ class DataSource(NamedTuple):
         return DataSource(
                 device=device,
                 module=module)
+
+
+class TimeRange(NamedTuple):
+    origin: datetime.datetime
+    period: datetime.timedelta
+
+    @property
+    def destination(self) -> datetime.datetime:
+        return self.origin + self.period
+
+    @property
+    def tzinfo(self) -> Optional[datetime.tzinfo]:
+        return self.origin.tzinfo
+
+    def shifted(self, delta: datetime.timedelta) -> 'TimeRange':
+        return TimeRange(
+                origin=self.origin + delta,
+                period=self.period)
 
 
 class XAxisMode(enum.Enum):
