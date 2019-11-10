@@ -6,7 +6,8 @@ import matplotlib
 import numpy
 import pyatmo.weather
 import pytz
-from ._plot_setting import DataSource, MeasurementsField, TimeRange, XAxisMode
+from ._plot_setting import (
+        DataSource, FigureFormat, MeasurementsField, TimeRange, XAxisMode)
 
 
 def get_data(
@@ -88,3 +89,34 @@ def setup_xaxis(
                     matplotlib.dates.MinuteLocator(minor_ticks, tz=tzinfo))
             axes.xaxis.set_minor_formatter(
                     matplotlib.dates.DateFormatter('%M', tz=tzinfo))
+
+
+def plot(
+        database: pyatmo.weather.Database,
+        figure_format: FigureFormat,
+        title: str,
+        source: DataSource,
+        fields: MeasurementsField,
+        time_range: TimeRange,
+        x_axis_mode: XAxisMode) -> None:
+    figure = matplotlib.figure.Figure(
+            figsize=figure_format.figsize(),
+            dpi=figure_format.dpi)
+    figure.suptitle(title)
+    axes = figure.add_subplot()
+    data_list = get_data(
+            database,
+            source,
+            fields,
+            time_range)
+    for data in data_list:
+        axes.plot(data[:, 0], data[:, 1])
+    axes.grid(True)
+    setup_xaxis(
+            axes,
+            time_range,
+            x_axis_mode)
+    figure.autofmt_xdate()
+    figure.savefig(
+            '{0}.{1}'.format(title, figure_format.format.name.lower()),
+            format=figure_format.format.name.lower())

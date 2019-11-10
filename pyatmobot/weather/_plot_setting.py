@@ -2,7 +2,7 @@
 
 import datetime
 import enum
-from typing import NamedTuple, Optional, Union
+from typing import NamedTuple, Optional, Tuple, Union
 import pyatmo.weather
 
 
@@ -66,6 +66,23 @@ class TimeRange(NamedTuple):
         return TimeRange(
                 origin=self.origin + delta,
                 period=self.period)
+
+
+class ImageFileFormat(enum.Enum):
+    PNG = enum.auto()
+    JPG = enum.auto()
+    PDF = enum.auto()
+    SVG = enum.auto()
+
+
+class FigureFormat(NamedTuple):
+    width: float = 6.4
+    height: float = 4.8
+    dpi: float = 100.0
+    format: ImageFileFormat = ImageFileFormat.PNG
+
+    def figsize(self) -> Tuple[float, float]:
+        return (self.width, self.height)
 
 
 class XAxisMode(enum.Enum):
