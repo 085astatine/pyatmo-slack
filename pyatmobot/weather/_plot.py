@@ -1,11 +1,42 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-from typing import Optional, Sequence, Union
+from typing import List, Optional, Sequence, Union
 import matplotlib
-from ._plot_setting import XAxisMode
+import numpy
+import pyatmo.weather
+import pytz
+from ._plot_setting import DataSource, MeasurementsField, XAxisMode
 
 
+def get_data(
+        database: pyatmo.weather.Database,
+        source: DataSource,
+        fields: Union[MeasurementsField, Sequence[MeasurementsField]],
+        origin: datetime.datetime,
+        period: datetime.timedelta) -> List[numpy.ndarray]:
+    if isinstance(fields, MeasurementsField):
+        fields = [fields]
+    device_list = [device for device in database.all_device()
+                   if source.device.is_target(device)]
+    module_list = [
+            module
+            for device in device_list
+            for module in device.modules
+            if source.module.is_target(module)]
+    result: List[numpy.ndarray] = []
+    for module in module_list:
+        timezone = pytz.timezone(module.device.timezone)
+        measurements_list = database.measurements(
+                module,
+                int(origin.timestamp()),
+                int((origin + period).timestamp()))
+        result.append(numpy.array([
+                [timezone.localize(
+                        datetime.datetime.fromtimestamp(x.timestamp)),
+                 *(getattr(x, field.name.lower()) for field in fields)]
+                for x in measurements_list]))
+    return result
 
 
 def setup_xaxis(
