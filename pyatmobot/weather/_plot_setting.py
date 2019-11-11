@@ -79,6 +79,8 @@ class FigureFormat(NamedTuple):
     width: float = 6.4
     height: float = 4.8
     dpi: float = 100.0
+    rows: int = 1
+    columns: int = 1
     format: ImageFileFormat = ImageFileFormat.PNG
 
     def figsize(self) -> Tuple[float, float]:
@@ -91,3 +93,9 @@ class XAxisMode(enum.Enum):
     DAY = enum.auto()
     HOUR = enum.auto()
     AUTO = enum.auto()
+
+
+class YSetting(NamedTuple):
+    field: MeasurementsField
+    position: int = 1
+    source: DataSource = DataSource()
