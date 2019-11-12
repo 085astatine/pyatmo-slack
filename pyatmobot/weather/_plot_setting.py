@@ -2,7 +2,7 @@
 
 import datetime
 import enum
-from typing import NamedTuple, Optional, Tuple, Union
+from typing import NamedTuple, Optional, Sequence, Tuple, Union
 import pyatmo.weather
 
 
@@ -93,6 +93,12 @@ class XAxisMode(enum.Enum):
     DAY = enum.auto()
     HOUR = enum.auto()
     AUTO = enum.auto()
+
+
+class XAxisSetting(NamedTuple):
+    mode: XAxisMode
+    with_minor_ticks: bool = False
+    minor_ticks: Optional[Union[int, Sequence[int]]] = None
 
 
 class YSetting(NamedTuple):

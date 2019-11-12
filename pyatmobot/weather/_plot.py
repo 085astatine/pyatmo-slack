@@ -8,7 +8,7 @@ import pyatmo.weather
 import pytz
 from ._plot_setting import (
         DataSource, FigureFormat, MeasurementsField, TimeRange, XAxisMode,
-        YSetting)
+        XAxisSetting, YSetting)
 
 
 def get_data(
@@ -99,7 +99,7 @@ def plot(
         default_source: DataSource,
         y_setting_list: Sequence[YSetting],
         time_range: TimeRange,
-        x_axis_mode: XAxisMode) -> None:
+        x_axis: XAxisSetting) -> None:
     figure = matplotlib.figure.Figure(
             figsize=figure_format.figsize(),
             dpi=figure_format.dpi)
@@ -123,7 +123,9 @@ def plot(
         setup_xaxis(
                 axes,
                 time_range,
-                x_axis_mode)
+                x_axis.mode,
+                x_axis.with_minor_ticks,
+                x_axis.minor_ticks)
     figure.autofmt_xdate()
     figure.savefig(
             '{0}.{1}'.format(title, figure_format.format.name.lower()),
