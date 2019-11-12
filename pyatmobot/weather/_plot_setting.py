@@ -101,7 +101,13 @@ class XAxisSetting(NamedTuple):
     minor_ticks: Optional[Union[int, Sequence[int]]] = None
 
 
-class YSetting(NamedTuple):
+class PlotValue(NamedTuple):
     field: MeasurementsField
-    position: int = 1
     source: DataSource = DataSource()
+
+
+class PlotSetting(NamedTuple):
+    position: int
+    values: Sequence[PlotValue]
+    time_range: TimeRange
+    x_axis: XAxisSetting

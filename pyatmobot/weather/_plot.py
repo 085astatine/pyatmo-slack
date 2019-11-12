@@ -7,8 +7,8 @@ import numpy
 import pyatmo.weather
 import pytz
 from ._plot_setting import (
-        DataSource, FigureFormat, MeasurementsField, TimeRange, XAxisMode,
-        XAxisSetting, YSetting)
+        DataSource, FigureFormat, MeasurementsField, PlotSetting, TimeRange,
+        XAxisMode, XAxisSetting)
 
 
 def get_data(
@@ -97,9 +97,7 @@ def plot(
         figure_format: FigureFormat,
         title: str,
         default_source: DataSource,
-        y_setting_list: Sequence[YSetting],
-        time_range: TimeRange,
-        x_axis: XAxisSetting) -> None:
+        plot_settings: Sequence[PlotSetting]) -> None:
     figure = matplotlib.figure.Figure(
             figsize=figure_format.figsize(),
             dpi=figure_format.dpi)
@@ -110,22 +108,23 @@ def plot(
                     figure_format.columns,
                     i)
             for i in range(1, figure_format.rows * figure_format.columns + 1)]
-    for y_setting in y_setting_list:
-        data_list = get_data(
-                database,
-                default_source.override(y_setting.source),
-                y_setting.field,
-                time_range)
-        for data in data_list:
-            axes_list[y_setting.position - 1].plot(data[:, 0], data[:, 1])
-    for axes in axes_list:
+    for plot_setting in plot_settings:
+        axes = axes_list[plot_setting.position - 1]
+        for value in plot_setting.values:
+            data_list = get_data(
+                    database,
+                    default_source.override(value.source),
+                    value.field,
+                    plot_setting.time_range)
+            for data in data_list:
+                axes.plot(data[:, 0], data[:, 1])
         axes.grid(True)
         setup_xaxis(
                 axes,
-                time_range,
-                x_axis.mode,
-                x_axis.with_minor_ticks,
-                x_axis.minor_ticks)
+                plot_setting.time_range,
+                plot_setting.x_axis.mode,
+                plot_setting.x_axis.with_minor_ticks,
+                plot_setting.x_axis.minor_ticks)
     figure.autofmt_xdate()
     figure.savefig(
             '{0}.{1}'.format(title, figure_format.format.name.lower()),
