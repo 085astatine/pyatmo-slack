@@ -117,7 +117,12 @@ def plot(
                     value.field,
                     plot_setting.time_range.shifted(value.time_shift))
             for data in data_list:
-                axes.plot(data[:, 0] - value.time_shift, data[:, 1])
+                axes.plot(
+                        data[:, 0] - value.time_shift,
+                        data[:, 1],
+                        label=value.label)
+        if any(value.label for value in plot_setting.values):
+            axes.legend(loc='best')
         axes.grid(True)
         setup_xaxis(
                 axes,

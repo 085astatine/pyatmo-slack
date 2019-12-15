@@ -103,6 +103,7 @@ class XAxisSetting(NamedTuple):
 
 class PlotValue(NamedTuple):
     field: MeasurementsField
+    label: str = ''
     source: DataSource = DataSource()
     time_shift: datetime.timedelta = datetime.timedelta()
 
